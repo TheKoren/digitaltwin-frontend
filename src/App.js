@@ -2,12 +2,15 @@ import logo from './logo.svg';
 import './App.css';
 import api from './api/axiosConfig';
 import {useState, useEffect} from 'react';
+import Layout from './components/Layout';
+import {Routes, Route} from 'react-router-dom';
+import Home from './components/home/Home'
 
 function App() {
 
   const [sensorValues, setSensorValues] = useState();
 
-  const getSensorValues = async () => {
+  const getSensorValues = async ( ) => {
     try {
 
       const response = await api.get("/api/data");
@@ -29,20 +32,11 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Routes>
+        <Route path="/" element={<Layout/>}>
+          <Route path="/" element={<Home/>}></Route>
+        </Route>
+      </Routes>
     </div>
   );
 }
