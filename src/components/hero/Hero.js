@@ -2,10 +2,10 @@ import React from 'react';
 import Carousel from 'react-material-ui-carousel';
 import {Paper, Typography} from '@mui/material';
 
-import image1 from '../../public/info.jpg';
-import image2 from '../../public/topology.jpg';
-import image3 from '../../public/analysis.jpg';
-import image4 from '../../public/carousel.jpg';
+import image1 from '../../assets/info.jpg';
+import image2 from '../../assets/topology.jpg';
+import image3 from '../../assets/analysis.jpg';
+import image4 from '../../assets/carousel.jpg';
 
 const images = [
     {
