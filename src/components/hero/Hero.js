@@ -1,11 +1,10 @@
 import React from 'react';
 import Carousel from 'react-material-ui-carousel';
-import {Paper, Typography} from '@mui/material';
+import {Paper} from '@mui/material';
 
 import image1 from '../../assets/info.jpg';
 import image2 from '../../assets/topology.jpg';
 import image3 from '../../assets/analysis.jpg';
-import image4 from '../../assets/carousel.jpg';
 
 const images = [
     {
@@ -22,8 +21,6 @@ const images = [
     },
 ];
 
-const background = image4;
-
 import './Hero.css';
 
 const Hero = () => {
@@ -39,13 +36,13 @@ const Hero = () => {
                 {images.map((image, index) => (
                     <Paper key={index}>
                         <div className='card-container'>
-                            <div className="card" style={{ "--img": `url(${background})` }}>
+                            <div className="card">
                                 <div className="detail">
                                     <div className="poster">
                                         <img src={image.src} alt={`Slide ${index + 1}`}/>
                                     </div>
                                     <div className="title">
-                                        <h4>{image.caption}</h4>
+                                        <h2>{image.caption}</h2>
                                     </div>
                                 </div>
                             </div>
