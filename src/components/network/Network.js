@@ -1,24 +1,30 @@
-import React from 'react'
 import Graph from "react-graph-vis";
+import {useState, useEffect} from 'react';
+import imageSrc1 from '../../assets/esp32.png';
+import imageSrc2 from '../../assets/spring.png';
 
 import "./styles.css";
 // need to import the vis network css in order to show tooltip
 import "./network.css";
 const Network = ({liveModel}) => {
 
-  var currentdate = new Date();
-  var datetime = "Last Sync: " +  currentdate.getFullYear() + "/"
-  + (currentdate.getMonth()+1)  + "/" 
-  + currentdate.getDate() + " "  
-  + currentdate.getHours() + ":"  
-  + currentdate.getMinutes() + ":" 
-  + currentdate.getSeconds();
+
+  const[currentDate, setCurrentDate] = useState(new Date());
+
+  var datetime = "Last Sync: " +  currentDate.getFullYear() + "/"
+  + (currentDate.getMonth()+1)  + "/" 
+  + currentDate.getDate() + " "  
+  + currentDate.getHours() + ":"  
+  + currentDate.getMinutes() + ":" 
+  + currentDate.getSeconds();
   // Extract the IoT devices from the JSON data
   const devices = liveModel.map((item) => {
     return {
       id: item.mac,
       label: item.mac,
       title: `Sensor Data:\nTemperature: ${item.sensorData.temperateValue}\nHumidity: ${item.sensorData.humidityValue}\nPressure: ${item.sensorData.pressure}`,
+      shape: 'circularImage',
+      image: imageSrc1
     };
   });
 
@@ -27,6 +33,8 @@ const Network = ({liveModel}) => {
     id: 'centralNode',
     label: 'Spring Boot Backend',
     title: 'Central Server node in the IoT network.',
+    shape: 'circularImage',
+    image: imageSrc2
   };
 
   // Create the nodes array by adding the central node and IoT devices
@@ -49,13 +57,73 @@ const Network = ({liveModel}) => {
     nodes: nodes,
     edges: edges,
   };
-
   const options = {
     layout: {
       hierarchical: true,
     },
+    nodes: {
+      borderWidth: 1,
+      borderWidthSelected: 4,
+      size: 50,
+      color: {
+        border: '#2B7CE9',
+        background: 'white',
+        highlight: {
+          border: '#2B7CE9',
+          background: '#D2E5FF'
+        },
+        hover: {
+          border: '#2B7CE9',
+          background: '#D2E5FF'
+        }
+      },
+      opacity: 1,
+      fixed: {
+        x:false,
+        y:false
+      },
+      font: {
+        color: '#343434',
+        size: 14, // px
+        face: 'arial',
+        background: 'none',
+        strokeWidth: 0, // px
+        strokeColor: '#ffffff',
+        align: 'center',
+        multi: false,
+        vadjust: 0,
+        bold: {
+          color: '#343434',
+          size: 14, // px
+          face: 'arial',
+          vadjust: 0,
+          mod: 'bold'
+        },
+        ital: {
+          color: '#343434',
+          size: 14, // px
+          face: 'arial',
+          vadjust: 0,
+          mod: 'italic',
+        },
+        boldital: {
+          color: '#343434',
+          size: 14, // px
+          face: 'arial',
+          vadjust: 0,
+          mod: 'bold italic'
+        },
+        mono: {
+          color: '#343434',
+          size: 15, // px
+          face: 'courier new',
+          vadjust: 2,
+          mod: ''
+        }
+      },
+    },
     edges: {
-      color: "#000000",
+      color: "black",
     },
     height: "500px",
   };
@@ -67,10 +135,18 @@ const Network = ({liveModel}) => {
     }
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentDate(new Date);
+    }, 2000);
+  
+    return () => clearInterval(interval);
+  })
   return (
     <div>
       <h1>Live model based on IoT network.</h1>
-      <h2>Last updated: {datetime}</h2>
+      <h4>Last updated: {datetime}.</h4>
+      <h4>Number of devices: {liveModel.length}</h4>
       <Graph
         graph={graph}
         options={options}
