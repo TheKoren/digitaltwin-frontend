@@ -1,9 +1,18 @@
 import React from 'react';
 import Hero from '../hero/Hero';
+import Network from '../network/Network';
 
-const Home = () => {
+const Home = ({liveModel}) => {
     return (
-        <Hero/>
+        <div>
+            <Hero/>
+            {liveModel ? (
+                <Network liveModel={liveModel}/>
+            ) : (
+                <p>Loading...</p>
+            )}
+        </div>
+        
     )
 }
 
