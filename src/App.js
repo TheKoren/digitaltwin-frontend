@@ -7,6 +7,7 @@ import {Routes, Route} from 'react-router-dom';
 import Home from './components/home/Home'
 import Header from './components/header/Header'
 
+
 function App() {
 
   const [liveModel, setLiveModel] = useState(null);
@@ -25,7 +26,11 @@ function App() {
   }
 
   useEffect(() => {
-    getLiveModel();
+    const interval = setInterval(() => {
+      getLiveModel();
+    }, 2000); //set your time here. repeat every 5 seconds
+  
+    return () => clearInterval(interval);
   }, [])
 
 
