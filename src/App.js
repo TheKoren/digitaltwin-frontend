@@ -9,17 +9,15 @@ import Header from './components/header/Header'
 
 function App() {
 
-  const [sensorValues, setSensorValues] = useState();
+  const [liveModel, setLiveModel] = useState(null);
 
-  const getSensorValues = async ( ) => {
+  const getLiveModel = async ( ) => {
     try {
 
-      const response = await api.get("/api/data");
+      const response = await api.get("/api/data/live");
 
-      console.log(response.data);
-
-      setSensorValues(response.data);
-
+      console.log("Received liveModel data:", response.data);
+      setLiveModel(response.data);
     } catch(err) {
       console.log(err);
     }
@@ -27,20 +25,30 @@ function App() {
   }
 
   useEffect(() => {
-    getSensorValues();
+    getLiveModel();
   }, [])
 
 
   return (
     <div className="App">
-      <Header/>
+      <Header />
       <Routes>
-        <Route path="/" element={<Layout/>}>
-          <Route path="/" element={<Home/>}></Route>
+        <Route path="/" element={<Layout />}>
+          <Route
+            path="/"
+            element={
+              liveModel ? (
+                <Home liveModel={liveModel} />
+              ) : (
+                <p>Loading...</p>
+              )
+            }
+          />
         </Route>
       </Routes>
     </div>
   );
+  
 }
 
 export default App;
