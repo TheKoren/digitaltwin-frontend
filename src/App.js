@@ -7,6 +7,7 @@ import {Routes, Route} from 'react-router-dom';
 import Home from './components/home/Home'
 import Header from './components/header/Header'
 import Network from './components/network/Network';
+import Dashboard from './components/dashboard/Dashboard';
 
 
 function App() {
@@ -61,6 +62,8 @@ function App() {
               )
             }
           />
+        <Route path="/analysis" element={<Dashboard />}>
+        </Route>
       </Routes>
     </div>
   );
