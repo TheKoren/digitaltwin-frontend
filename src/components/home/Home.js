@@ -1,18 +1,14 @@
 import React from 'react';
 import Hero from '../hero/Hero';
-import Network from '../network/Network';
+import About from '../about/About'
 
-const Home = ({liveModel}) => {
+
+const Home = () => {
     return (
         <div>
             <Hero/>
-            {liveModel ? (
-                <Network liveModel={liveModel}/>
-            ) : (
-                <p>Loading...</p>
-            )}
+            <About/>
         </div>
-        
     )
 }
 

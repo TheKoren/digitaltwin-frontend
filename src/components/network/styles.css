@@ -2,4 +2,32 @@
     font-family: sans-serif;
     text-align: center;
   }
+
+.network-container {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  text-align: center;
+}
+
+.network-title {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.network-info {
+  display: flex;
+  justify-content: space-between;
+}
+
+.network-info-item {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+}
+
   
