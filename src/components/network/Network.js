@@ -143,18 +143,13 @@ const Network = ({liveModel}) => {
     return () => clearInterval(interval);
   })
   return (
-    <div>
-      <h1>Live model based on IoT network.</h1>
-      <h4>Last updated: {datetime}.</h4>
-      <h4>Number of devices: {liveModel.length}</h4>
-      <Graph
-        graph={graph}
-        options={options}
-        events={events}
-        getNetwork={network => {
-          // If you need access to the vis.js network API, you can set the state in a parent component using this property
-        }}
-      />
+    <div className="network-container">
+      <h1 className="network-title">Live model based on IoT network</h1>
+      <div className="network-info">
+        <p className="network-info-item">Last updated: {datetime}</p>
+        <p className="network-info-item">Number of devices: {liveModel.length}</p>
+      </div>
+      <Graph graph={graph} options={options} events={events} />
     </div>
   );
 }
