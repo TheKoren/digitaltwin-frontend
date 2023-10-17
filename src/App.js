@@ -28,7 +28,7 @@ function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       getLiveModel();
-    }, 2000); //set your time here. repeat every 5 seconds
+    }, 5000); //set your time here. repeat every 60 seconds
   
     return () => clearInterval(interval);
   }, [])

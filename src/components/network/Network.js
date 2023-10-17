@@ -22,7 +22,9 @@ const Network = ({liveModel}) => {
     return {
       id: item.mac,
       label: item.mac,
-      title: `Sensor Data:\nTemperature: ${item.sensorData.temperateValue}\nHumidity: ${item.sensorData.humidityValue}\nPressure: ${item.sensorData.pressure}`,
+      title: `Data\nTemperature: ${item.sensorData.temperateValue} °C\nHumidity: ${item.sensorData.humidityValue}%\nPressure: ${item.sensorData.pressure} Pa\n` + 
+             `CO2: ${item.sensorData.eco2}ppm\nTVOC: ${item.sensorData.tvocValue}ppb\nSound: ${item.sensorData.sound} dB\nLight: ${item.sensorData.light} lx\nUV: ${item.sensorData.uv}\n` +
+             `RSSI: ${item.wifiData.rssi}dB\nTxPower: ${item.wifiData.txPower} dBm\nChannel: ${item.wifiData.channel}`,
       shape: 'circularImage',
       image: imageSrc1
     };
@@ -43,13 +45,11 @@ const Network = ({liveModel}) => {
   // Create the edges array to connect nodes based on the addressList
   const edges = [];
   liveModel.forEach((item) => {
-    if (item.wifiData.addressList.length > 0) {
-      item.wifiData.addressList.forEach((address) => {
-        edges.push({ from: item.mac, to: address });
-      });
-    } else {
-      // Connect nodes with an empty addressList to the central node
+    if (item.wifiData.addressList) {
       edges.push({ from: 'centralNode', to: item.mac });
+      item.wifiData.addressList.forEach((address) => {
+        edges.push({ from: item.mac, to: String(address).toUpperCase() });
+      });
     }
   });
 
