@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import Chart from "react-apexcharts";
 import api from '../../api/axiosConfig';
 
@@ -9,24 +9,24 @@ const Dashboard = () => {
     const [macList, setMacList] = useState(null);
     const [chartData, setChartData] = useState(null);
 
-    const getMacList = async ( ) => {
-      try {
-        const response = await api.get("/api/data/all/macs");
-        console.log("All macs: ", response.data);
-        setMacList(response.data);
-      } catch(err) {
-        console.log(err);
-      }
+    const getMacList = async () => {
+        try {
+            const response = await api.get("/api/data/all/macs");
+            console.log("All macs: ", response.data);
+            setMacList(response.data);
+        } catch (err) {
+            console.log(err);
+        }
     }
-  
+
     useEffect(() => {
         getMacList();
-      }, []); 
+    }, []);
 
     useEffect(() => {
         updateChart();
     }, [deviceData]);
-    
+
     const handleDeviceChange = (event) => {
         const selectedDeviceName = event.target.value;
         if (selectedDeviceName != "") {
@@ -40,13 +40,13 @@ const Dashboard = () => {
             const response = await api.get("/api/data/all/" + selectedDeviceName)
             console.log("Device data: ", response.data);
             setDeviceData(response.data);
-        } catch(err) {
+        } catch (err) {
             console.log(err);
         }
     }
 
     const updateChart = () => {
-        if(deviceData) {
+        if (deviceData) {
             const timeStamps = [];
             const temperatureValues = [];
             const humidityValues = [];
@@ -77,6 +77,9 @@ const Dashboard = () => {
                     },
                     xaxis: {
                         categories: timeStamps
+                    },
+                    stroke: {
+                        width: 1
                     }
                 },
                 series: [
@@ -119,37 +122,34 @@ const Dashboard = () => {
         }
     }
 
-    
+
     return (
-        <div className="app">
-            <div className="row">
-                <div className="mixed-chart">
-                    {macList ? (
-                        <select value={selectedDevice} onChange={handleDeviceChange}>
-                            <option value="">Select a Device</option>
-                            {macList.map((mac) => (
-                                <option key={mac} value={mac}>
-                                    {mac}
-                                </option>
-                            ))}
-                        </select>
-                    ) : (
-                        <p>Loading...</p>
-                    )}
-                    {chartData && chartData.options && chartData.series ? (
-                        <div>
-                        <Chart
-                            options={chartData.options}
-                            series={chartData.series}
-                            type="line"
-                            width={"100%"}
-                        />
-                        </div>
-                    ) : (
-                        <p>No graph to show yet.</p>
-                    )}
+        <div className="mixed-chart">
+            <h2 className="chart-title">Device Data Chart</h2>
+            {macList ? (
+                <select value={selectedDevice} onChange={handleDeviceChange}>
+                    <option value="">Select a Device</option>
+                    {macList.map((mac) => (
+                        <option key={mac} value={mac}>
+                            {mac}
+                        </option>
+                    ))}
+                </select>
+            ) : (
+                <p>Loading...</p>
+            )}
+            {chartData && chartData.options && chartData.series ? (
+                <div>
+                    <Chart
+                        options={chartData.options}
+                        series={chartData.series}
+                        type="line"
+                        width={"70%"}
+                    />
                 </div>
-            </div>
+            ) : (
+                <p>No graph to show yet.</p>
+            )}
         </div>
     );
 }
