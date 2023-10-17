@@ -6,6 +6,7 @@ import Layout from './components/Layout';
 import {Routes, Route} from 'react-router-dom';
 import Home from './components/home/Home'
 import Header from './components/header/Header'
+import Network from './components/network/Network';
 
 
 function App() {
@@ -50,6 +51,16 @@ function App() {
             }
           />
         </Route>
+        <Route 
+            path="/topology"
+            element={
+              liveModel ? (
+                <Network liveModel={liveModel} />
+              ) : (
+                <p>Loading...</p>
+              )
+            }
+          />
       </Routes>
     </div>
   );
