@@ -1,0 +1,20 @@
+.navbar {
+  padding: 5px 10px; /* Adjust padding values as needed */
+}
+
+.navbar-brand {
+  font-size: 1.5rem; /* Adjust font size as needed */
+}
+
+.nav-link {
+  padding: 0.25rem 0.5rem; /* Adjust padding values for the links */
+  font-size: 1rem; /* Adjust font size for the links */
+}
+
+.navbar-collapse {
+  justify-content: flex-end; /* Align links to the right */
+}
+
+.navbar-nav {
+  max-height: none; /* Adjust the max height for the links if necessary */
+}
