@@ -4,12 +4,13 @@
     align-items: center;
     padding: 120px;
     height: 50vh;
+    background-color: white;
   }
   
   .about-text {
     flex: 1;
     padding: 20px;
-    background-color: #f5f5f5;
+    background-color: white;
     border-radius: 5px;
   }
   
@@ -19,7 +20,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f5f5f5;
+    background-color: white;
     border-radius: 5px;
   }
   

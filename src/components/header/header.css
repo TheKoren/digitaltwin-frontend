@@ -1,20 +1,48 @@
 .navbar {
-  padding: 5px 10px; /* Adjust padding values as needed */
+  height: 12%;
+  display: flex;
+  align-items: center;
 }
 
-.navbar-brand {
-  font-size: 1.5rem; /* Adjust font size as needed */
+.logo {
+  display: flex;
+  align-items: center;
+  width: 50px;
+  cursor: pointer;
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+.logo.clicked {
+  transform: scale(1.2);
 }
 
-.nav-link {
-  padding: 0.25rem 0.5rem; /* Adjust padding values for the links */
-  font-size: 1rem; /* Adjust font size for the links */
+.menu-icon {
+  width: 30px;
+  cursor: pointer;
+  margin-left: 40px;
 }
 
-.navbar-collapse {
-  justify-content: flex-end; /* Align links to the right */
+.nav {
+  flex: 1;
+  text-align: right;
 }
 
-.navbar-nav {
-  max-height: none; /* Adjust the max height for the links if necessary */
+nav ul li {
+  list-style: none;
+  display: inline-block;
+  margin-left: 60px;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: black;
+  font-size: 20px;
+}
+
+.menu-container {
+  display: flex;
+}
+
+.menu-container.hidden {
+  display: none;
 }

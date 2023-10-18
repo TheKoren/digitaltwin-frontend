@@ -5,14 +5,14 @@
   font-family: 'Quicksand', Arial, Helvetica, sans-serif;
 }
 body{
-  padding:0;
-  margin:0;
+  padding-left: 8%;
+  padding-right: 8%;
+  box-sizing: border-box;
 }
 .App{
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: white;
   color: black;
   margin-top: 10px;
 }
