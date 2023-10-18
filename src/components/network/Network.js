@@ -22,7 +22,7 @@ const Network = ({liveModel}) => {
     return {
       id: item.mac,
       label: item.mac,
-      title: `Data\nTemperature: ${item.sensorData.temperateValue} °C\nHumidity: ${item.sensorData.humidityValue}%\nPressure: ${item.sensorData.pressure} Pa\n` + 
+      title: `Data\nTemperature: ${item.sensorData.temperatureValue} °C\nHumidity: ${item.sensorData.humidityValue}%\nPressure: ${item.sensorData.pressure} Pa\n` + 
              `CO2: ${item.sensorData.eco2}ppm\nTVOC: ${item.sensorData.tvocValue}ppb\nSound: ${item.sensorData.sound} dB\nLight: ${item.sensorData.light} lx\nUV: ${item.sensorData.uv}\n` +
              `RSSI: ${item.wifiData.rssi}dB\nTxPower: ${item.wifiData.txPower} dBm\nChannel: ${item.wifiData.channel}\nSensorRead: ${item.wifiData.sensorRead}ms\nSensorExec: ${item.wifiData.sensorExec}ms`,
       shape: 'circularImage',
