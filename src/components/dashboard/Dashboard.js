@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Chart from "react-apexcharts";
 import api from '../../api/axiosConfig';
+import {ScaleLoader} from 'react-spinners';
 
 
 const Dashboard = () => {
@@ -8,11 +9,19 @@ const Dashboard = () => {
     const [deviceData, setDeviceData] = useState(null);
     const [macList, setMacList] = useState(null);
     const [chartData, setChartData] = useState(null);
+    const [numberOfElements, setNumberOfElements] = useState(100);
+    const [showWarning, setShowWarning] = useState(false);
+
+
+    const handleNumberOfElementsChange = (event) => {
+        const newValue = event.target.value;
+        setNumberOfElements(newValue);
+        setShowWarning(newValue > 1000);
+      };
 
     const getMacList = async () => {
         try {
             const response = await api.get("/api/data/all/macs");
-            console.log("All macs: ", response.data);
             setMacList(response.data);
         } catch (err) {
             console.log(err);
@@ -25,7 +34,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         updateChart();
-    }, [deviceData]);
+    }, [deviceData, numberOfElements]);
 
     const handleDeviceChange = (event) => {
         const selectedDeviceName = event.target.value;
@@ -37,8 +46,7 @@ const Dashboard = () => {
 
     const getDeviceData = async (selectedDeviceName) => {
         try {
-            const response = await api.get("/api/data/all/" + selectedDeviceName)
-            console.log("Device data: ", response.data);
+            const response = await api.get("/api/data/all/" + selectedDeviceName + "/" + numberOfElements)
             setDeviceData(response.data);
         } catch (err) {
             console.log(err);
@@ -56,9 +64,9 @@ const Dashboard = () => {
             const soundValues = [];
             const lightValues = [];
             const uvValues = [];
-            const numberOfElements = Math.min(deviceData.length, 1000);
+            const elementNumber = Math.min(deviceData.length, numberOfElements);
 
-            for (let i = deviceData.length - numberOfElements; i < deviceData.length; i++) {
+            for (let i = deviceData.length - elementNumber; i < deviceData.length; i++) {
                 const dataPoint = deviceData[i];
                 timeStamps.push(dataPoint.timestamp);
                 temperatureValues.push(dataPoint.sensorData.temperatureValue);
@@ -73,13 +81,20 @@ const Dashboard = () => {
             const updatedChart = {
                 options: {
                     chart: {
-                        background: '#f4f4f4'
+                        background: '#f4f4f4',
+                        animations: {
+                            enabled: false
+                        }
                     },
                     xaxis: {
+                        type: 'datetime',
                         categories: timeStamps
                     },
                     stroke: {
                         width: 1
+                    },
+                    markers: {
+                        size: 0
                     }
                 },
                 series: [
@@ -117,15 +132,53 @@ const Dashboard = () => {
                     }
                 ]
             };
-            console.log(updatedChart);
             setChartData(updatedChart);
         }
     }
+
+    const fetchDataAndUpdateChart = async () => {
+        if (selectedDevice) {
+            await getDeviceData(selectedDevice);
+            updateChart();
+        }
+    }
+
+    useEffect(() => {
+        // Update the chart automatically every N seconds (e.g., every 30 seconds)
+        const interval = setInterval(fetchDataAndUpdateChart, 30000); // Change the interval as needed
+    
+        // Perform the initial fetch and update
+        fetchDataAndUpdateChart();
+    
+        // Cleanup the interval on unmount
+        return () => clearInterval(interval);
+      }, [selectedDevice]); // Update chart when selectedDevice changes
 
 
     return (
         <div className="mixed-chart">
             <h2 className="chart-title">Device Data Chart</h2>
+            <div>
+                <label htmlFor="numberOfElements">Number of Elements: {numberOfElements}</label>
+                <input
+                type="range"
+                id="numberOfElements"
+                name="numberOfElements"
+                min="100"
+                max="5000"
+                step="100"
+                value={numberOfElements}
+                onChange={handleNumberOfElementsChange}
+                />
+                {showWarning && (
+                    <div className="warning">
+                        <span className="warning-text">
+                        Warning: Scaling above 1000 may cause performance issues.
+                        </span>
+                        <span className="warning-sign">⚠️</span>
+                    </div>
+                )}
+            </div>
             {macList ? (
                 <select value={selectedDevice} onChange={handleDeviceChange}>
                     <option value="">Select a Device</option>
@@ -136,7 +189,7 @@ const Dashboard = () => {
                     ))}
                 </select>
             ) : (
-                <p>Loading...</p>
+                <ScaleLoader color="#89cff0" />
             )}
             {chartData && chartData.options && chartData.series ? (
                 <div>
@@ -148,7 +201,10 @@ const Dashboard = () => {
                     />
                 </div>
             ) : (
-                <p>No graph to show yet.</p>
+                selectedDevice ?
+                <ScaleLoader color="#89cff0" /> : (
+                    <p>No graph to show yet.</p>
+                )
             )}
         </div>
     );

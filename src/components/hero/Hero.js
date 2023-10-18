@@ -29,7 +29,7 @@ import './Hero.css';
 
 const Hero = () => {
     return (
-        <div className="carousel-container"> {/* Apply styles to the container */}
+        <div className="carousel-container">
             <Carousel
                 animation="fade"
                 timeout={5000}

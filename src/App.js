@@ -8,6 +8,7 @@ import Home from './components/home/Home'
 import Header from './components/header/Header'
 import Network from './components/network/Network';
 import Dashboard from './components/dashboard/Dashboard';
+import { ScaleLoader } from 'react-spinners';
 
 
 function App() {
@@ -41,16 +42,7 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route
-            path="/"
-            element={
-              liveModel ? (
-                <Home liveModel={liveModel} />
-              ) : (
-                <p>Loading...</p>
-              )
-            }
-          />
+          <Route path="/" element={<Home/>}/>
         </Route>
         <Route 
             path="/topology"
@@ -58,11 +50,13 @@ function App() {
               liveModel ? (
                 <Network liveModel={liveModel} />
               ) : (
-                <p>Loading...</p>
+                <ScaleLoader color="#89cff0" />
               )
             }
           />
         <Route path="/analysis" element={<Dashboard />}>
+        </Route>
+        <Route path="/events">
         </Route>
       </Routes>
     </div>

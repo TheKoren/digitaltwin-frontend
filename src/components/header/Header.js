@@ -1,33 +1,40 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faNetworkWired } from "@fortawesome/free-solid-svg-icons";
-import Container from "react-bootstrap/Container";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import { NavLink } from "react-router-dom";
 import './header.css'
+import imageSrc from "../../assets/menu.png"
+import { useState } from "react";
 
 const Header = () => {
-  return (
-    <Navbar bg="light" variant="light" expand="lg">
-        <Container fluid>
-            <Navbar.Brand href="/" style={{"color": 'black'}}>
-                <FontAwesomeIcon icon={faNetworkWired}/> DigitalTwin
-            </Navbar.Brand>
-            <Navbar.Toggle aria-controls="navbarScroll"/>
-            <Navbar.Collapse id="navbarScroll">
-                <Nav
-                    className="me-auto my-2 my-lg-0"
-                    style={{maxHeight: '100px'}}
-                    navbarScroll
-                    >
-                        <NavLink className ="nav-link" to="/">Home</NavLink>
-                        <NavLink className ="nav-link" to="/topology">Topology</NavLink>
-                        <NavLink className ="nav-link" to="/analysis">Analysis</NavLink>
-                </Nav>
-            </Navbar.Collapse>
 
-        </Container>
-    </Navbar>
+    const [menuVisible, setMenuVisible] = useState(false);
+    const [isClicked, setIsClicked] = useState(false);
+
+    const toggleMenu = () => {
+    setMenuVisible(!menuVisible);
+    }
+
+    const handleLogoClick = () => {
+        setIsClicked(!isClicked);
+    }
+
+
+  return (
+    <div className="navbar">
+        <div className={`logo ${isClicked ? 'clicked' : ''}`} onClick={handleLogoClick}>
+            <FontAwesomeIcon icon={faNetworkWired} style={{ marginRight: '5px' }}/> DigitalTwin
+        </div>        
+        <nav>
+            <div className={`menu-container ${menuVisible ? 'hidden' : ''}`}>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/topology">Topology</a></li>
+                    <li><a href="/analysis">Analysis</a></li>
+                    <li><a href="/events">Events</a></li>
+                </ul>
+            </div>
+        </nav>
+        <img src={imageSrc} className="menu-icon" onClick={toggleMenu} />
+    </div>
   )
 }
 
