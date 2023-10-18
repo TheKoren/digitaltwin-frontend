@@ -1,0 +1,36 @@
+/* Style for the notification container */
+.notification {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid black; /* Add black borders */
+    border-radius: 10px; /* Make edges rounder */
+  }
+  
+  /* Style for "WARNING" notifications */
+  .notification.WARNING {
+    background-color: orange;
+    color: white;
+  }
+  
+  /* Style for "ANALYSIS" notifications */
+  .notification.ANALYSIS {
+    background-color: babyblue;
+    color: black;
+  }
+  
+  /* Style for "ERROR" notifications */
+  .notification.ERROR {
+    background-color: red;
+    color: white;
+  }
+  
+  /* Style for bold text */
+  .bold-text {
+    font-weight: bold;
+  }
+  
+  /* Style for bold text within notifications */
+  .notification .bold-text {
+    /* You can add additional styles here if needed */
+  }
+  
