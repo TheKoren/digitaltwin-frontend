@@ -9,6 +9,7 @@ import Header from './components/header/Header'
 import Network from './components/network/Network';
 import Dashboard from './components/dashboard/Dashboard';
 import { ScaleLoader } from 'react-spinners';
+import Notification from './components/notification/Notification';
 
 
 function App() {
@@ -56,7 +57,7 @@ function App() {
           />
         <Route path="/analysis" element={<Dashboard />}>
         </Route>
-        <Route path="/events">
+        <Route path="/notification" element={<Notification/>}>
         </Route>
       </Routes>
     </div>
