@@ -1,34 +1,37 @@
 import Graph from "react-graph-vis";
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import api from '../../api/axiosConfig';
 import imageSrc1 from '../../assets/esp32.png';
 import imageSrc2 from '../../assets/spring.png';
 import imageSrc3 from '../../assets/esp8266.jpg'
-import {ScaleLoader} from 'react-spinners';
+import { ScaleLoader } from 'react-spinners';
 
 
 import "./styles.css";
 // need to import the vis network css in order to show tooltip
 import "./network.css";
-const Network = ({liveModel}) => {
+const Network = ({ liveModel }) => {
 
   const [monitorData, setMonitorData] = useState(null);
-  const[currentDate, setCurrentDate] = useState(new Date());
+  const [currentDevice, setCurrentDevice] = useState("");
+  const [reconnecting, setReconnecting] = useState(false);
+  const [lightControlling, setLightControlling] = useState(false);
+  const [currentDate, setCurrentDate] = useState(new Date());
 
-  var datetime = "Last Sync: " +  currentDate.getFullYear() + "/"
-  + (currentDate.getMonth()+1)  + "/" 
-  + currentDate.getDate() + " "  
-  + currentDate.getHours() + ":"  
-  + currentDate.getMinutes() + ":" 
-  + currentDate.getSeconds();
+  var datetime = "Last Sync: " + currentDate.getFullYear() + "/"
+    + (currentDate.getMonth() + 1) + "/"
+    + currentDate.getDate() + " "
+    + currentDate.getHours() + ":"
+    + currentDate.getMinutes() + ":"
+    + currentDate.getSeconds();
   // Extract the IoT devices from the JSON data
   const devices = liveModel.map((item) => {
     return {
       id: item.mac,
       label: item.mac,
-      title: `Data\nTemperature: ${item.sensorData.temperatureValue} °C\nHumidity: ${item.sensorData.humidityValue}%\nPressure: ${item.sensorData.pressure} Pa\n` + 
-             `CO2: ${item.sensorData.eco2}ppm\nTVOC: ${item.sensorData.tvocValue}ppb\nSound: ${item.sensorData.sound} dB\nLight: ${item.sensorData.light} lx\nUV: ${item.sensorData.uv}\n` +
-             `RSSI: ${item.wifiData.rssi}dB\nTxPower: ${item.wifiData.txPower} dBm\nChannel: ${item.wifiData.channel}\nSensorRead: ${item.wifiData.sensorRead}ms\nSensorExec: ${item.wifiData.sensorExec}ms`,
+      title: `Data\nTemperature: ${item.sensorData.temperatureValue} °C\nHumidity: ${item.sensorData.humidityValue}%\nPressure: ${item.sensorData.pressure} Pa\n` +
+        `CO2: ${item.sensorData.eco2}ppm\nTVOC: ${item.sensorData.tvocValue}ppb\nSound: ${item.sensorData.sound} dB\nLight: ${item.sensorData.light} lx\nUV: ${item.sensorData.uv}\n` +
+        `RSSI: ${item.wifiData.rssi}dB\nTxPower: ${item.wifiData.txPower} dBm\nChannel: ${item.wifiData.channel}\nSensorRead: ${item.wifiData.sensorRead}ms\nSensorExec: ${item.wifiData.sensorExec}ms`,
       shape: 'circularImage',
       image: imageSrc1
     };
@@ -56,7 +59,6 @@ const Network = ({liveModel}) => {
 
   // Create the edges array to connect nodes based on the addressList
   const edges = [];
-  edges.push({from: 'centralNode', to: 'monitorNode'});
   liveModel.forEach((item) => {
     if (item.wifiData.addressList) {
       edges.push({ from: 'centralNode', to: item.mac });
@@ -92,8 +94,8 @@ const Network = ({liveModel}) => {
       },
       opacity: 1,
       fixed: {
-        x:false,
-        y:false
+        x: false,
+        y: false
       },
       font: {
         color: '#343434',
@@ -142,9 +144,40 @@ const Network = ({liveModel}) => {
   };
 
   const events = {
-    select: function(event) {
+    select: function (event) {
       var { nodes, edges } = event;
-      // Handle node selection here if needed
+      if (nodes.length === 1) {
+        const selectedDevice = nodes[0];
+        if (selectedDevice !== 'monitorNode' && selectedDevice !== 'centralNode') {
+          setCurrentDevice(selectedDevice);
+        }
+      }
+    }
+  };
+
+  const handleReconnectWiFi = async () => {
+    if (currentDevice) {
+      setReconnecting(true);
+      try {
+        await api.post("/api/control/reconnect", currentDevice)
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setReconnecting(false);
+      }
+    }
+  };
+
+  const handleLightControl = async () => {
+    if (currentDevice) {
+      setLightControlling(true);
+      try {
+        await api.post("/api/control/light", currentDevice)
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLightControlling(false);
+      }
     }
   };
 
@@ -152,17 +185,17 @@ const Network = ({liveModel}) => {
     const interval = setInterval(() => {
       setCurrentDate(new Date);
     }, 2000);
-  
+
     return () => clearInterval(interval);
   })
 
   useEffect(() => {
-    const fetchMonitorData = async() => {
+    const fetchMonitorData = async () => {
       try {
-      const response = await api.get("/api/data/monitor")
-      console.log(response.data);
-      setMonitorData(response.data);}
-      catch(e) {
+        const response = await api.get("/api/data/monitor")
+        setMonitorData(response.data);
+      }
+      catch (e) {
         console.error(e);
       }
     }
@@ -173,35 +206,60 @@ const Network = ({liveModel}) => {
       <h1 className="network-title">Live model based on IoT network</h1>
       <div className="network-info">
         <p className="network-info-item">Last updated: {datetime}</p>
-        <p className="network-info-item">Number of devices: {liveModel.length}</p>
+        <p className="network-info-item">Number of devices in Wi-Fi hierarchy: {liveModel.length}</p>
       </div>
       <Graph graph={graph} options={options} events={events} />
+      <div className="device-controls">
+        <h4>Device Controls</h4>
+        <select value={currentDevice} onChange={(e) => setCurrentDevice(e.target.value)}>
+          <option value="">Select Device</option>
+          {liveModel.map((device) => (
+            <option key={device.mac} value={device.mac}>
+              {device.mac}
+            </option>
+          ))}
+        </select>
+        <button onClick={handleReconnectWiFi} disabled={!currentDevice || reconnecting || (liveModel.find((device) => device.mac === currentDevice)?.wifiData.mode === "AP_STA")}>
+          {reconnecting ? "Reconnecting..." : "Reconnect Wi-Fi"}
+        </button>
+        <button onClick={handleLightControl} disabled={!currentDevice || lightControlling}>
+          {lightControlling ? "LightControlling..." : "Control light"}
+        </button>
+      </div>
       <div className="network-monitor">
         {monitorData ? (
           <div className="table-container">
             <h4>Monitor node contents</h4>
             <pre>Mac: {monitorData.mac}</pre>
-            <table>
-               <thead>
+            <table style={{ borderCollapse: 'collapse', width: '80%', margin: 'auto', border: '1px solid black' }}>
+              <thead>
                 <tr>
-                  <th>SSID</th>
-                  <th>RSSI</th>
-                  <th>Channel</th>
+                  <th style={{ padding: '10px', border: '1px solid black' }}>SSID</th>
+                  <th style={{ padding: '10px', border: '1px solid black' }}>RSSI</th>
+                  <th style={{ padding: '10px', border: '1px solid black' }}>Channel</th>
                 </tr>
-               </thead>
-               <tbody>
+              </thead>
+              <tbody>
                 {monitorData.networksList.map((network, index) => (
                   <tr key={index}>
-                    <td>{network.ssid}</td>
-                    <td>{network.rssi}</td>
-                    <td>{network.channel}</td>
+                    <td style={{ padding: '10px', border: '1px solid black', fontWeight: network.ssid === 'Koren' || network.ssid === 'ESP32' ? 'bold' : 'normal' }}>
+                      {network.ssid}
+                    </td>
+                    <td style={{ padding: '10px', border: '1px solid black', fontWeight: network.ssid === 'Koren' || network.ssid === 'ESP32' ? 'bold' : 'normal' }}>
+                      {network.rssi}
+                    </td>
+                    <td style={{ padding: '10px', border: '1px solid black', fontWeight: network.ssid === 'Koren' || network.ssid === 'ESP32' ? 'bold' : 'normal' }}>
+                      {network.channel}
+                    </td>
                   </tr>
                 ))}
-               </tbody>
+              </tbody>
             </table>
+
+            <pre>Last update: {monitorData.timestamp}</pre>
           </div>
         ) : (
-        <ScaleLoader color="#89cff0" />)}
+          <ScaleLoader color="#89cff0" />)}
       </div>
     </div>
   );

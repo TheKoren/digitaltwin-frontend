@@ -25,11 +25,11 @@ const Header = () => {
         </div>        
         <nav>
             <div className={`menu-container ${menuVisible ? 'hidden' : ''}`}>
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/topology">Topology</a></li>
-                    <li><a href="/analysis">Analysis</a></li>
-                    <li><a href="/notification">Notifications</a></li>
+                <ul className="menu-list">
+                    <li><a href="/" className="menu-item">Home</a></li>
+                    <li><a href="/topology" className="menu-item">Live model</a></li>
+                    <li><a href="/analysis" className="menu-item">Analysis</a></li>
+                    <li><a href="/notification" className="menu-item">Notifications & Events</a></li>
                 </ul>
             </div>
         </nav>
