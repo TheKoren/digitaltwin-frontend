@@ -219,7 +219,7 @@ const Dashboard = () => {
                         <p>No graph to show yet.</p>
                     )
             )}
-             {clusters && (
+             {clusters ? (
                         <div className="cluster-info">
                             <h2>Cluster Information</h2>
                             <h6>Result of similarity check. Those devices that have similar measurement data are considered to be in the same cluster.</h6>
@@ -234,6 +234,8 @@ const Dashboard = () => {
                                 </div>
                             ))}
                         </div>
+                    ) : (
+                        <p>Not enough data gathered yet to determine clusters.</p>
                     )}
         </div>
     );
