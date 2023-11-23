@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Chart from "react-apexcharts";
 import api from '../../api/axiosConfig';
-import {ScaleLoader} from 'react-spinners';
+import { ScaleLoader } from 'react-spinners';
 
 
 const Dashboard = () => {
@@ -11,13 +11,14 @@ const Dashboard = () => {
     const [chartData, setChartData] = useState(null);
     const [numberOfElements, setNumberOfElements] = useState(100);
     const [showWarning, setShowWarning] = useState(false);
+    const [clusters, setClusters] = useState(null);
 
 
     const handleNumberOfElementsChange = (event) => {
         const newValue = event.target.value;
         setNumberOfElements(newValue);
         setShowWarning(newValue > 1000);
-      };
+    };
 
     const getMacList = async () => {
         try {
@@ -28,8 +29,19 @@ const Dashboard = () => {
         }
     }
 
+    const getClusters = async () => {
+        try {
+            const response = await api.get("/api/data/cluster");
+            console.log(response);
+            setClusters(response.data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     useEffect(() => {
         getMacList();
+        getClusters();
     }, []);
 
     useEffect(() => {
@@ -147,13 +159,13 @@ const Dashboard = () => {
     useEffect(() => {
         // Update the chart automatically every N seconds (e.g., every 30 seconds)
         const interval = setInterval(fetchDataAndUpdateChart, 30000); // Change the interval as needed
-    
+
         // Perform the initial fetch and update
         fetchDataAndUpdateChart();
-    
+
         // Cleanup the interval on unmount
         return () => clearInterval(interval);
-      }, [selectedDevice]); // Update chart when selectedDevice changes
+    }, [selectedDevice]); // Update chart when selectedDevice changes
 
 
     return (
@@ -162,19 +174,19 @@ const Dashboard = () => {
             <div>
                 <label htmlFor="numberOfElements">Number of Elements: {numberOfElements}</label>
                 <input
-                type="range"
-                id="numberOfElements"
-                name="numberOfElements"
-                min="100"
-                max="5000"
-                step="100"
-                value={numberOfElements}
-                onChange={handleNumberOfElementsChange}
+                    type="range"
+                    id="numberOfElements"
+                    name="numberOfElements"
+                    min="100"
+                    max="5000"
+                    step="100"
+                    value={numberOfElements}
+                    onChange={handleNumberOfElementsChange}
                 />
                 {showWarning && (
                     <div className="warning">
                         <span className="warning-text">
-                        Warning: Scaling above 1000 may cause performance issues.
+                            Warning: Scaling above 1000 may cause performance issues.
                         </span>
                         <span className="warning-sign">⚠️</span>
                     </div>
@@ -203,10 +215,26 @@ const Dashboard = () => {
                 </div>
             ) : (
                 selectedDevice ?
-                <ScaleLoader color="#89cff0" /> : (
-                    <p>No graph to show yet.</p>
-                )
+                    <ScaleLoader color="#89cff0" /> : (
+                        <p>No graph to show yet.</p>
+                    )
             )}
+             {clusters && (
+                        <div className="cluster-info">
+                            <h2>Cluster Information</h2>
+                            <h6>Result of similarity check. Those devices that have similar measurement data are considered to be in the same cluster.</h6>
+                            {clusters.map((cluster, index) => (
+                                <div key={index}>
+                                    <p>{`${index + 1}# Cluster:`}</p>
+                                    <ul>
+                                        {cluster.map((item, itemIndex) => (
+                                            <li key={itemIndex}>ESP32 device mac address: {item}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
+                    )}
         </div>
     );
 }
