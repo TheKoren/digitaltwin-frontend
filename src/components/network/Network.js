@@ -1,14 +1,18 @@
 import Graph from "react-graph-vis";
 import {useState, useEffect} from 'react';
+import api from '../../api/axiosConfig';
 import imageSrc1 from '../../assets/esp32.png';
 import imageSrc2 from '../../assets/spring.png';
+import imageSrc3 from '../../assets/esp8266.jpg'
+import {ScaleLoader} from 'react-spinners';
+
 
 import "./styles.css";
 // need to import the vis network css in order to show tooltip
 import "./network.css";
 const Network = ({liveModel}) => {
 
-
+  const [monitorData, setMonitorData] = useState(null);
   const[currentDate, setCurrentDate] = useState(new Date());
 
   var datetime = "Last Sync: " +  currentDate.getFullYear() + "/"
@@ -39,11 +43,20 @@ const Network = ({liveModel}) => {
     image: imageSrc2
   };
 
+  const monitorNode = {
+    id: 'monitorNode',
+    label: monitorData?.mac,
+    title: `ESP8266 Monitor node`,
+    shape: 'circularImage',
+    image: imageSrc3
+  }
+
   // Create the nodes array by adding the central node and IoT devices
-  const nodes = [centralNode, ...devices];
+  const nodes = [centralNode, monitorNode, ...devices];
 
   // Create the edges array to connect nodes based on the addressList
   const edges = [];
+  edges.push({from: 'centralNode', to: 'monitorNode'});
   liveModel.forEach((item) => {
     if (item.wifiData.addressList) {
       edges.push({ from: 'centralNode', to: item.mac });
@@ -142,6 +155,19 @@ const Network = ({liveModel}) => {
   
     return () => clearInterval(interval);
   })
+
+  useEffect(() => {
+    const fetchMonitorData = async() => {
+      try {
+      const response = await api.get("/api/data/monitor")
+      console.log(response.data);
+      setMonitorData(response.data);}
+      catch(e) {
+        console.error(e);
+      }
+    }
+    fetchMonitorData();
+  }, [])
   return (
     <div className="network-container">
       <h1 className="network-title">Live model based on IoT network</h1>
@@ -150,6 +176,33 @@ const Network = ({liveModel}) => {
         <p className="network-info-item">Number of devices: {liveModel.length}</p>
       </div>
       <Graph graph={graph} options={options} events={events} />
+      <div className="network-monitor">
+        {monitorData ? (
+          <div className="table-container">
+            <h4>Monitor node contents</h4>
+            <pre>Mac: {monitorData.mac}</pre>
+            <table>
+               <thead>
+                <tr>
+                  <th>SSID</th>
+                  <th>RSSI</th>
+                  <th>Channel</th>
+                </tr>
+               </thead>
+               <tbody>
+                {monitorData.networksList.map((network, index) => (
+                  <tr key={index}>
+                    <td>{network.ssid}</td>
+                    <td>{network.rssi}</td>
+                    <td>{network.channel}</td>
+                  </tr>
+                ))}
+               </tbody>
+            </table>
+          </div>
+        ) : (
+        <ScaleLoader color="#89cff0" />)}
+      </div>
     </div>
   );
 }

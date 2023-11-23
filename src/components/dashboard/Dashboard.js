@@ -47,6 +47,7 @@ const Dashboard = () => {
     const getDeviceData = async (selectedDeviceName) => {
         try {
             const response = await api.get("/api/data/all/" + selectedDeviceName + "/" + numberOfElements)
+            console.log(response)
             setDeviceData(response.data);
         } catch (err) {
             console.log(err);
