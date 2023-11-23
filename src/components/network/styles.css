@@ -11,6 +11,8 @@
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   background-color: #fff;
   text-align: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .network-title {
@@ -29,5 +31,6 @@
   color: #666;
   margin: 0;
 }
+
 
   
