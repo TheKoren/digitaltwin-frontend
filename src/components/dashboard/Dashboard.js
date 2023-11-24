@@ -12,6 +12,10 @@ const Dashboard = () => {
     const [numberOfElements, setNumberOfElements] = useState(100);
     const [showWarning, setShowWarning] = useState(false);
     const [clusters, setClusters] = useState(null);
+    const [histogramData, setHistogramData] = useState(null);
+    const [sensorExecHistogramData, setSensorExecHistogramData] = useState(null);
+    const [minSensorExec, setMinSensorExec] = useState(null);
+    const [maxSensorExec, setMaxSensorExec] = useState(null);
 
 
     const handleNumberOfElementsChange = (event) => {
@@ -46,6 +50,8 @@ const Dashboard = () => {
 
     useEffect(() => {
         updateChart();
+        updateHistogram();
+        updateSensorExecHistogram();
     }, [deviceData, numberOfElements]);
 
     const handleDeviceChange = (event) => {
@@ -61,6 +67,11 @@ const Dashboard = () => {
             const response = await api.get("/api/data/all/" + selectedDeviceName + "/" + numberOfElements)
             console.log(response)
             setDeviceData(response.data);
+            const sensorExecValues = response.data.map(dataPoint => dataPoint.wifiData.sensorExec);
+            const minSensorExecValue = Math.min(...sensorExecValues);
+            const maxSensorExecValue = Math.max(...sensorExecValues);
+            setMinSensorExec(minSensorExecValue);
+            setMaxSensorExec(maxSensorExecValue);
         } catch (err) {
             console.log(err);
         }
@@ -97,11 +108,35 @@ const Dashboard = () => {
                         background: '#f4f4f4',
                         animations: {
                             enabled: false
+                        },
+                        title: {
+                            text: 'Sensor Data Chart',
+                            align: 'center',
+                            style: {
+                                fontSize: '16px',
+                                color: '#333'
+                            }
                         }
                     },
                     xaxis: {
                         type: 'datetime',
-                        categories: timeStamps
+                        categories: timeStamps,
+                        title: {
+                            text: 'Timestamp',
+                            style: {
+                                fontSize: '14px',
+                                color: '#333'
+                            }
+                        }
+                    },
+                    yaxis: {
+                        title: {
+                            text: 'Sensor Values',
+                            style: {
+                                fontSize: '14px',
+                                color: '#333'
+                            }
+                        }
                     },
                     stroke: {
                         width: 1
@@ -149,10 +184,154 @@ const Dashboard = () => {
         }
     }
 
+    const updateSensorExecHistogram = () => {
+        if (deviceData) {
+            const sensorExecValues = deviceData.map(dataPoint => dataPoint.wifiData.sensorExec);
+            const minRange = Math.floor(minSensorExec / 100) * 100;
+            const maxRange = Math.ceil(maxSensorExec / 100) * 100;
+
+            const histogramRanges = Array.from({ length: (maxRange - minRange) / 100 + 1 }, (_, index) => [
+                minRange + index * 100,
+                minRange + (index + 1) * 100 - 1
+            ]);
+            const sensorExecHistogram = {};
+            histogramRanges.forEach(range => {
+                const [start, end] = range;
+                const count = sensorExecValues.filter(value => value >= start && value <= end).length;
+                sensorExecHistogram[`${start}-${end}`] = count;
+            })
+            const sensorExecHistogramChartData = {
+                options: {
+                    chart: {
+                        background: '#f4f4f4',
+                        animations: {
+                            enabled: false
+                        },
+                        title: {
+                            text: 'Sensor read execution Histogram Chart',
+                            align: 'center',
+                            style: {
+                                fontSize: '16px',
+                                color: '#333'
+                            }
+                        }
+                    },
+                    xaxis: {
+                        categories: Object.keys(sensorExecHistogram),
+                        title: {
+                            text: 'Sensor Execution Range [ms]',
+                            style: {
+                                fontSize: '14px',
+                                color: '#333'
+                            }
+                        }
+                    },
+                    yaxis: {
+                        title: {
+                            text: 'Number of Messages',
+                            style: {
+                                fontSize: '14px',
+                                color: '#333'
+                            }
+                        }
+                    },
+                    stroke: {
+                        width: 1
+                    },
+                    markers: {
+                        size: 0
+                    }
+                },
+                series: [
+                    {
+                        name: "Sensor Execution time",
+                        data: Object.values(sensorExecHistogram)
+                    }
+                ]
+            };
+            setSensorExecHistogramData(sensorExecHistogramChartData);
+        }
+    };
+
+    const updateHistogram = () => {
+        if (deviceData) {
+            const rssiValues = deviceData.map(dataPoint => dataPoint.wifiData.rssi);
+            const histogram = calculateHistogram(rssiValues);
+            const histogramChartData = {
+                options: {
+                    chart: {
+                        background: '#f4f4f4',
+                        animations: {
+                            enabled: false
+                        }
+                    },
+                    xaxis: {
+                        categories: Object.keys(histogram),
+                        title: {
+                            text: 'RSSI Range [dB]',
+                            style: {
+                                fontSize: '14px',
+                                color: '#333'
+                            }
+                        }
+                    },
+                    yaxis: {
+                        title: {
+                            text: 'Number of Messages',
+                            style: {
+                                fontSize: '14px',
+                                color: '#333'
+                            }
+                        }
+                    },
+                    stroke: {
+                        width: 1
+                    },
+                    markers: {
+                        size: 0
+                    }
+                },
+                series: [
+                    {
+                        name: "Number of Messages",
+                        data: Object.values(histogram)
+                    }
+                ]
+            };
+            setHistogramData(histogramChartData);
+        }
+    };
+
+    const calculateHistogram = (values) => {
+        const histogram = {};
+        const ranges = [
+            [-99, -90],
+            [-89, -80],
+            [-79, -70],
+            [-69, -60],
+            [-59, -50],
+            [-49, -40],
+            [-39, -30],
+            [-29, -20],
+            [-19, -10],
+            [-9, 0]
+        ];
+
+        ranges.forEach(range => {
+            const [start, end] = range;
+            const count = values.filter(value => value >= start && value <= end).length;
+            histogram[`[${start.toString()}:${end.toString()}]`] = count;
+        });
+
+        return histogram;
+    };
+
     const fetchDataAndUpdateChart = async () => {
         if (selectedDevice) {
             await getDeviceData(selectedDevice);
             updateChart();
+            updateHistogram();
+            updateSensorExecHistogram();
         }
     }
 
@@ -210,7 +389,7 @@ const Dashboard = () => {
                         options={chartData.options}
                         series={chartData.series}
                         type="line"
-                        width={"70%"}
+                        width={"50%"}
                     />
                 </div>
             ) : (
@@ -219,24 +398,48 @@ const Dashboard = () => {
                         <p>No graph to show yet.</p>
                     )
             )}
-             {clusters ? (
-                        <div className="cluster-info">
-                            <h2>Cluster Information</h2>
-                            <h6>Result of similarity check. Those devices that have similar measurement data are considered to be in the same cluster.</h6>
-                            {clusters.map((cluster, index) => (
-                                <div key={index}>
-                                    <p>{`${index + 1}# Cluster:`}</p>
-                                    <ul>
-                                        {cluster.map((item, itemIndex) => (
-                                            <li key={itemIndex}>ESP32 device mac address: {item}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ))}
+            {histogramData && histogramData.options && histogramData.series ? (
+                <div>
+                    <Chart
+                        options={histogramData.options}
+                        series={histogramData.series}
+                        type="bar"
+                        width={"50%"}
+                    />
+                </div>
+            ) : (
+                <p>No histogram data available yet.</p>
+            )}
+            {sensorExecHistogramData && sensorExecHistogramData.options && sensorExecHistogramData.series ? (
+                <div>
+                    <Chart
+                        options={sensorExecHistogramData.options}
+                        series={sensorExecHistogramData.series}
+                        type="bar"
+                        width={"50%"}
+                    />
+                </div>
+            ) : (
+                <p>No sensorExec histogram data available yet.</p>
+            )}
+            {clusters ? (
+                <div className="cluster-info">
+                    <h2>Cluster Information</h2>
+                    <h6>Result of similarity check. Those devices that have similar measurement data are considered to be in the same cluster.</h6>
+                    {clusters.map((cluster, index) => (
+                        <div key={index}>
+                            <p>{`${index + 1}# Cluster:`}</p>
+                            <ul>
+                                {cluster.map((item, itemIndex) => (
+                                    <li key={itemIndex}>ESP32 device mac address: {item}</li>
+                                ))}
+                            </ul>
                         </div>
-                    ) : (
-                        <p>Not enough data gathered yet to determine clusters.</p>
-                    )}
+                    ))}
+                </div>
+            ) : (
+                <p>Not enough data gathered yet to determine clusters.</p>
+            )}
         </div>
     );
 }
