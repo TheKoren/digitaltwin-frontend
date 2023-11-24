@@ -32,7 +32,7 @@ function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       getLiveModel();
-    }, 5000); //set your time here. repeat every 60 seconds
+    }, 10000);
   
     return () => clearInterval(interval);
   }, [])
