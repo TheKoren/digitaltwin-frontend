@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import api from './api/axiosConfig';
 import {useState, useEffect} from 'react';
-import Layout from './components/Layout';
+import Layout from './components/home/Layout';
 import {Routes, Route} from 'react-router-dom';
 import Home from './components/home/Home'
 import Header from './components/header/Header'
