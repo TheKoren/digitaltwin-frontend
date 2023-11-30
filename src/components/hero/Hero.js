@@ -6,6 +6,7 @@ import {Link} from 'react-router-dom';
 import image1 from '../../assets/info.jpg';
 import image2 from '../../assets/topology.jpg';
 import image3 from '../../assets/analysis.jpg';
+import image4 from '../../assets/notification.png'
 
 const images = [
     {
@@ -23,6 +24,11 @@ const images = [
         caption: "Analysis",
         route: '/analysis',
     },
+    {
+        src: image4,
+        caption: "Notification",
+        route: '/notification'
+    }
 ];
 
 import './Hero.css';
