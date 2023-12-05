@@ -166,7 +166,6 @@ const Notification = () => {
             <div className="bold-text">Type: </div>
             <div>{notification.type}</div>
             <div className="bold-text">Message: {notification.message}</div>
-            <div>{notification.message}</div>
             {notification.parent && (
               <div className="parent">
                 <div className="parent bold-text">Related message:</div>
